@@ -21,6 +21,15 @@ const UI = {
   // Header
   userEmailDisplay: document.getElementById('user-email-display'),
   logoutBtn: document.getElementById('logout-btn'),
+  changePwBtn: document.getElementById('change-pw-btn'),
+  
+  // Modal Change Password
+  changePwModal: document.getElementById('change-pw-modal'),
+  closePwModal: document.getElementById('close-pw-modal'),
+  oldPassword: document.getElementById('old-password'),
+  newPassword: document.getElementById('new-password'),
+  confirmPassword: document.getElementById('confirm-password'),
+  submitPwBtn: document.getElementById('submit-pw-btn'),
   
   // Hero
   heroStatusBadge: document.getElementById('hero-status-badge'),
@@ -121,6 +130,34 @@ async function apiLogin(email, password) {
         action: 'user_login',
         email: email,
         password: password
+      }),
+      redirect: 'follow',
+      signal: controller.signal
+    });
+    return await res.json();
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      return { success: false, message: 'Koneksi timeout. Server tidak merespons.' };
+    }
+    return { success: false, message: 'Gagal terhubung ke server.' };
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+async function apiChangePassword(email, oldPassword, newPassword) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+  
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'user_change_password',
+        email: email,
+        oldPassword: oldPassword,
+        newPassword: newPassword
       }),
       redirect: 'follow',
       signal: controller.signal
@@ -317,6 +354,56 @@ UI.logoutBtn.addEventListener('click', () => {
   currentSession = null;
   showLogin();
   showToast('Logout berhasil', 'success');
+});
+
+// Change Password Modal
+UI.changePwBtn.addEventListener('click', () => {
+  UI.oldPassword.value = '';
+  UI.newPassword.value = '';
+  UI.confirmPassword.value = '';
+  UI.changePwModal.classList.add('active');
+});
+
+UI.closePwModal.addEventListener('click', () => {
+  UI.changePwModal.classList.remove('active');
+});
+
+UI.submitPwBtn.addEventListener('click', async () => {
+  const oldPw = UI.oldPassword.value.trim();
+  const newPw = UI.newPassword.value.trim();
+  const confirmPw = UI.confirmPassword.value.trim();
+  
+  if (!oldPw || !newPw || !confirmPw) {
+    showToast('Semua field harus diisi!', 'warning');
+    return;
+  }
+  
+  if (newPw !== confirmPw) {
+    showToast('Konfirmasi password tidak cocok!', 'warning');
+    return;
+  }
+  
+  if (newPw.length < 6) {
+    showToast('Password baru minimal 6 karakter!', 'warning');
+    return;
+  }
+  
+  UI.submitPwBtn.disabled = true;
+  UI.submitPwBtn.innerText = 'Menyimpan...';
+  
+  const email = currentSession.email;
+  const res = await apiChangePassword(email, oldPw, newPw);
+  
+  UI.submitPwBtn.disabled = false;
+  UI.submitPwBtn.innerText = 'Simpan Password';
+  
+  if (res.success) {
+    showToast('Password berhasil diubah!', 'success');
+    UI.changePwModal.classList.remove('active');
+    // Session remains active. Next login will require new password.
+  } else {
+    showToast(res.message || 'Gagal mengubah password.', 'error');
+  }
 });
 
 // ══════════════════════════════════════

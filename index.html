@@ -59,6 +59,10 @@
       </div>
       <div class="header-right">
         <span id="user-email-display" class="user-email-label"></span>
+        <button id="change-pw-btn" class="icon-btn" style="margin-right: 8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
+          Ganti Password
+        </button>
         <button id="logout-btn" class="icon-btn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           Logout
@@ -152,6 +156,31 @@
     <footer class="dashboard-footer">
       <p>© 2026 Retain - ROASlab. Butuh bantuan? Hubungi <a href="mailto:support@roaslab.com">support@roaslab.com</a></p>
     </footer>
+  </div>
+
+  <!-- Change Password Modal -->
+  <div id="change-pw-modal" class="modal-overlay">
+    <div class="modal-panel glass-panel">
+      <div class="modal-header">
+        <h3>🔑 Ganti Password</h3>
+        <button id="close-pw-modal" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group">
+          <label for="old-password">Password Lama</label>
+          <input type="password" id="old-password" placeholder="Masukkan password saat ini" />
+        </div>
+        <div class="input-group">
+          <label for="new-password">Password Baru</label>
+          <input type="password" id="new-password" placeholder="Minimal 6 karakter" />
+        </div>
+        <div class="input-group">
+          <label for="confirm-password">Konfirmasi Password Baru</label>
+          <input type="password" id="confirm-password" placeholder="Ulangi password baru" />
+        </div>
+        <button id="submit-pw-btn" class="primary-btn" style="margin-top: 10px;">Simpan Password</button>
+      </div>
+    </div>
   </div>
 
   <!-- Toast Container -->
