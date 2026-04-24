@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════════════════════
 
 // --- KONFIGURASI ---
-const GAS_URL = 'https://script.google.com/macros/s/AKfycby1ROI_hn3vPFKOcGF4YlJkEfnA3wNUYwOSlDGioR6ZW1BN0XeuwiL1m2PBOWzpK9TX-w/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxtAlXWY2zCiAj0ufekPhOqjdYI57z1v1ZkLSiQb_DatjiTTqBxz_5SYEw6cMCFFLd5dw/exec';
 
 // --- UI Elements ---
 const UI = {
