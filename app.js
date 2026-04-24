@@ -1,0 +1,330 @@
+// ═══════════════════════════════════════════════════════
+// RETAIN - ROASLAB : USER DASHBOARD APP
+// ═══════════════════════════════════════════════════════
+
+// --- KONFIGURASI ---
+const GAS_URL = 'https://script.google.com/macros/s/AKfycby1ROI_hn3vPFKOcGF4YlJkEfnA3wNUYwOSlDGioR6ZW1BN0XeuwiL1m2PBOWzpK9TX-w/exec';
+
+// --- UI Elements ---
+const UI = {
+  loginScreen: document.getElementById('login-screen'),
+  dashboardScreen: document.getElementById('dashboard-screen'),
+  
+  // Login
+  userEmail: document.getElementById('user-email'),
+  userPassword: document.getElementById('user-password'),
+  loginBtn: document.getElementById('login-btn'),
+  loginError: document.getElementById('login-error'),
+  btnText: null, // set after DOM ready
+  btnLoader: null,
+  
+  // Header
+  userEmailDisplay: document.getElementById('user-email-display'),
+  logoutBtn: document.getElementById('logout-btn'),
+  
+  // Hero
+  heroStatusBadge: document.getElementById('hero-status-badge'),
+  heroPackage: document.getElementById('hero-package'),
+  heroKey: document.getElementById('hero-key'),
+  heroExpire: document.getElementById('hero-expire'),
+  heroShops: document.getElementById('hero-shops'),
+  
+  // Info cards
+  infoKey: document.getElementById('info-key'),
+  infoPkg: document.getElementById('info-pkg'),
+  infoStatus: document.getElementById('info-status'),
+  infoExpire: document.getElementById('info-expire'),
+  
+  // Shops
+  shopsCounter: document.getElementById('shops-counter'),
+  shopsList: document.getElementById('shops-list'),
+  
+  // Timeline
+  timelineContainer: document.getElementById('timeline-container'),
+  
+  // Toast
+  toastContainer: document.getElementById('toast-container'),
+};
+
+// --- Session ---
+let currentSession = JSON.parse(sessionStorage.getItem('retain_user_session') || 'null');
+
+// ══════════════════════════════════════
+// TOAST SYSTEM
+// ══════════════════════════════════════
+
+function showToast(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  const icons = { success: '✅', error: '❌', warning: '⚠️' };
+  toast.innerHTML = `
+    <div class="toast-icon">${icons[type] || '📢'}</div>
+    <div class="toast-message">${message}</div>
+  `;
+  UI.toastContainer.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('show'));
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 350);
+  }, 3000);
+}
+
+// ══════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '-';
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${day} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function daysUntilExpiry(dateStr) {
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return null;
+  d.setHours(23, 59, 59, 999);
+  const diff = d - new Date();
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
+function getActionIcon(action) {
+  const icons = {
+    'Created': '🆕', 'Revoked': '🚫', 'Activated': '✅',
+    'Unbind': '🔗', 'Payment': '💰', 'Renewed': '🔄',
+    'Upgraded': '⬆️', 'Downgraded': '⬇️', 'Note': '📝'
+  };
+  return icons[action] || '📋';
+}
+
+const PKG_LABELS = {
+  'Starter': 'Starter (1 Toko)',
+  'Growth': 'Growth (2 Toko)',
+  'Scale': 'Scale (5 Toko)',
+  'Unlimited': 'Unlimited'
+};
+
+// ══════════════════════════════════════
+// API
+// ══════════════════════════════════════
+
+async function apiLogin(email, password) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+  
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'user_login',
+        email: email,
+        password: password
+      }),
+      redirect: 'follow',
+      signal: controller.signal
+    });
+    return await res.json();
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      return { success: false, message: 'Koneksi timeout. Server tidak merespons.' };
+    }
+    return { success: false, message: 'Gagal terhubung ke server.' };
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+// ══════════════════════════════════════
+// ROUTING
+// ══════════════════════════════════════
+
+function showLogin() {
+  UI.loginScreen.classList.add('active');
+  UI.dashboardScreen.classList.remove('active');
+}
+
+function showDashboard(data) {
+  UI.loginScreen.classList.remove('active');
+  UI.dashboardScreen.classList.add('active');
+  renderDashboard(data);
+}
+
+// ══════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════
+
+function renderDashboard(data) {
+  // Header
+  UI.userEmailDisplay.textContent = data.email || '';
+  
+  // Hero
+  UI.heroStatusBadge.textContent = data.status;
+  UI.heroStatusBadge.className = `hero-badge ${data.status}`;
+  UI.heroPackage.textContent = PKG_LABELS[data.pkg] || data.pkg;
+  UI.heroKey.textContent = data.key;
+  
+  const daysLeft = daysUntilExpiry(data.expire);
+  let expireDisplay = formatDate(data.expire);
+  if (daysLeft !== null && data.status === 'Active') {
+    if (daysLeft <= 0) {
+      expireDisplay += ' (Expired!)';
+    } else if (daysLeft <= 7) {
+      expireDisplay = `${daysLeft} hari lagi`;
+    }
+  }
+  UI.heroExpire.textContent = expireDisplay;
+  UI.heroShops.textContent = `${data.shops.length} / ${data.maxShops}`;
+  
+  // Info Cards
+  UI.infoKey.textContent = data.key;
+  UI.infoPkg.textContent = PKG_LABELS[data.pkg] || data.pkg;
+  UI.infoStatus.textContent = data.status;
+  UI.infoExpire.textContent = formatDate(data.expire);
+  
+  // Shops
+  renderShops(data.shops, data.maxShops);
+  
+  // Timeline
+  renderTimeline(data.history);
+}
+
+function renderShops(shops, maxShops) {
+  UI.shopsCounter.textContent = `${shops.length} / ${maxShops}`;
+  
+  if (shops.length === 0) {
+    UI.shopsList.innerHTML = `
+      <div class="shops-empty">
+        <span class="shops-empty-icon">🏪</span>
+        Belum ada toko yang terikat ke lisensi ini.
+      </div>
+    `;
+  } else {
+    UI.shopsList.innerHTML = shops.map((shop, i) => `
+      <div class="shop-item" style="animation-delay: ${i * 0.05}s">
+        <div class="shop-icon">🏪</div>
+        <span class="shop-name">${shop}</span>
+      </div>
+    `).join('');
+  }
+  
+  // Slot progress bar
+  const percentage = Math.min((shops.length / maxShops) * 100, 100);
+  UI.shopsList.innerHTML += `
+    <div class="shop-slot-bar">
+      <div class="slot-bar-header">
+        <span>Penggunaan Slot</span>
+        <span>${shops.length} / ${maxShops}</span>
+      </div>
+      <div class="slot-bar-track">
+        <div class="slot-bar-fill" style="width: ${percentage}%"></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderTimeline(historyStr) {
+  let history = [];
+  try {
+    history = JSON.parse(historyStr || '[]');
+  } catch (e) {
+    history = [];
+  }
+  
+  if (history.length === 0) {
+    UI.timelineContainer.innerHTML = `
+      <div class="timeline-empty">
+        <span class="timeline-empty-icon">📜</span>
+        Belum ada histori langganan tercatat.
+      </div>
+    `;
+    return;
+  }
+  
+  const reversed = [...history].reverse();
+  
+  UI.timelineContainer.innerHTML = reversed.map((entry, i) => {
+    const actionClass = (entry.action || 'Note').toLowerCase();
+    const actionIcon = getActionIcon(entry.action);
+    return `
+      <div class="timeline-item ${actionClass}" style="animation-delay: ${i * 0.06}s">
+        <div class="timeline-dot">${actionIcon}</div>
+        <div class="timeline-content">
+          <div class="timeline-action">${entry.action || 'Note'}</div>
+          <div class="timeline-detail">${entry.detail || '-'}</div>
+          <div class="timeline-date">${entry.date || '-'}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ══════════════════════════════════════
+// EVENT HANDLERS
+// ══════════════════════════════════════
+
+// Login
+UI.loginBtn.addEventListener('click', async () => {
+  const email = UI.userEmail.value.trim();
+  const password = UI.userPassword.value.trim();
+  
+  if (!email || !password) {
+    UI.loginError.style.display = 'block';
+    UI.loginError.textContent = 'Masukkan email dan password!';
+    return;
+  }
+  
+  // Loading state
+  const btnText = UI.loginBtn.querySelector('.btn-text');
+  const btnLoader = UI.loginBtn.querySelector('.btn-loader');
+  btnText.style.display = 'none';
+  btnLoader.style.display = 'inline-flex';
+  UI.loginBtn.disabled = true;
+  UI.loginError.style.display = 'none';
+  
+  const res = await apiLogin(email, password);
+  
+  // Reset button
+  btnText.style.display = 'inline';
+  btnLoader.style.display = 'none';
+  UI.loginBtn.disabled = false;
+  
+  if (res.success && res.data) {
+    // Save session
+    currentSession = { email, data: res.data };
+    sessionStorage.setItem('retain_user_session', JSON.stringify(currentSession));
+    
+    showToast('Login berhasil!', 'success');
+    showDashboard(res.data);
+  } else {
+    UI.loginError.style.display = 'block';
+    UI.loginError.textContent = res.message || 'Login gagal. Coba lagi.';
+  }
+});
+
+// Login on Enter
+UI.userPassword.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') UI.loginBtn.click();
+});
+UI.userEmail.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') UI.userPassword.focus();
+});
+
+// Logout
+UI.logoutBtn.addEventListener('click', () => {
+  sessionStorage.removeItem('retain_user_session');
+  currentSession = null;
+  showLogin();
+  showToast('Logout berhasil', 'success');
+});
+
+// ══════════════════════════════════════
+// INIT — Restore session
+// ══════════════════════════════════════
+
+if (currentSession && currentSession.data) {
+  showDashboard(currentSession.data);
+} else {
+  showLogin();
+}

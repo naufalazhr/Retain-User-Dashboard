@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retain - ROASlab | My License</title>
+  <meta name="description" content="Lihat informasi lisensi, toko terdaftar, dan histori langganan Retain - ROASlab Anda.">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Login Screen -->
+  <div id="login-screen" class="screen full-center active">
+    <div class="login-container">
+      <div class="login-brand">
+        <div class="brand-icon">🚀</div>
+        <h1>Retain <span>ROASlab</span></h1>
+        <p class="brand-tagline">Lihat informasi lisensi & histori langganan Anda</p>
+      </div>
+      <div class="glass-panel login-panel">
+        <h2>Login ke Dashboard</h2>
+        <p>Masukkan email dan password yang terdaftar di lisensi Anda.</p>
+        
+        <div class="input-group">
+          <label for="user-email">Email</label>
+          <div class="input-icon-wrapper">
+            <span class="input-icon">📧</span>
+            <input type="email" id="user-email" placeholder="contoh@email.com" autocomplete="email"/>
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label for="user-password">Password</label>
+          <div class="input-icon-wrapper">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="user-password" placeholder="••••••••" autocomplete="current-password"/>
+          </div>
+        </div>
+        
+        <button id="login-btn" class="primary-btn">
+          <span class="btn-text">Masuk</span>
+          <span class="btn-loader" style="display:none;">
+            <span class="spinner"></span> Memverifikasi...
+          </span>
+        </button>
+        <p id="login-error" class="error-msg"></p>
+      </div>
+      <p class="login-footer">Belum punya lisensi? <a href="https://roaslab.com" target="_blank">Dapatkan di sini</a></p>
+    </div>
+  </div>
+
+  <!-- Dashboard Screen -->
+  <div id="dashboard-screen" class="screen">
+    <header class="glass-header">
+      <div class="header-left">
+        <div class="logo">Retain <span>ROASlab</span></div>
+        <span class="header-badge">My License</span>
+      </div>
+      <div class="header-right">
+        <span id="user-email-display" class="user-email-label"></span>
+        <button id="logout-btn" class="icon-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Logout
+        </button>
+      </div>
+    </header>
+
+    <main class="dashboard-content">
+      
+      <!-- License Status Hero -->
+      <section id="license-hero" class="license-hero glass-panel">
+        <div class="hero-status-area">
+          <div class="hero-badge-wrapper">
+            <span id="hero-status-badge" class="hero-badge Active">Active</span>
+          </div>
+          <h2 id="hero-package">Starter</h2>
+          <p class="hero-sub" id="hero-key">RET-****-XXXX</p>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <span class="hero-stat-value" id="hero-expire">-</span>
+            <span class="hero-stat-label">Expired</span>
+          </div>
+          <div class="hero-divider"></div>
+          <div class="hero-stat">
+            <span class="hero-stat-value" id="hero-shops">0 / 1</span>
+            <span class="hero-stat-label">Slot Toko</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Info Grid -->
+      <section class="info-grid">
+        <div class="info-card glass-panel">
+          <div class="info-card-icon blue">📋</div>
+          <div class="info-card-body">
+            <span class="info-card-label">License Key</span>
+            <span class="info-card-value" id="info-key">-</span>
+          </div>
+        </div>
+        <div class="info-card glass-panel">
+          <div class="info-card-icon purple">📦</div>
+          <div class="info-card-body">
+            <span class="info-card-label">Paket Langganan</span>
+            <span class="info-card-value" id="info-pkg">-</span>
+          </div>
+        </div>
+        <div class="info-card glass-panel">
+          <div class="info-card-icon green">✅</div>
+          <div class="info-card-body">
+            <span class="info-card-label">Status Lisensi</span>
+            <span class="info-card-value" id="info-status">-</span>
+          </div>
+        </div>
+        <div class="info-card glass-panel">
+          <div class="info-card-icon orange">📅</div>
+          <div class="info-card-body">
+            <span class="info-card-label">Berlaku Hingga</span>
+            <span class="info-card-value" id="info-expire">-</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Two Columns: Shops + Timeline -->
+      <section class="two-columns">
+
+        <!-- Registered Shops -->
+        <div class="column-card glass-panel">
+          <div class="column-header">
+            <h3>🏪 Toko Terdaftar</h3>
+            <span class="shops-counter" id="shops-counter">0 / 1</span>
+          </div>
+          <div id="shops-list" class="shops-list-container">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- History Timeline -->
+        <div class="column-card glass-panel">
+          <div class="column-header">
+            <h3>📜 Histori Langganan</h3>
+          </div>
+          <div id="timeline-container" class="timeline">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <footer class="dashboard-footer">
+      <p>© 2026 Retain - ROASlab. Butuh bantuan? Hubungi <a href="mailto:support@roaslab.com">support@roaslab.com</a></p>
+    </footer>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
