@@ -25,7 +25,7 @@
         <div class="input-group">
           <label for="user-email">Email</label>
           <div class="input-icon-wrapper">
-            <span class="input-icon">📧</span>
+            <span class="input-icon"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></span>
             <input type="email" id="user-email" placeholder="contoh@email.com" autocomplete="email"/>
           </div>
         </div>
@@ -33,7 +33,7 @@
         <div class="input-group">
           <label for="user-password">Password</label>
           <div class="input-icon-wrapper">
-            <span class="input-icon">🔒</span>
+            <span class="input-icon"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
             <input type="password" id="user-password" placeholder="••••••••" autocomplete="current-password"/>
           </div>
         </div>
@@ -198,21 +198,30 @@
   <div id="change-pw-modal" class="modal-overlay">
     <div class="modal-panel glass-panel">
       <div class="modal-header">
-        <h3>🔑 Ganti Password</h3>
+        <h3><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;vertical-align:middle;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>Ganti Password</h3>
         <button id="close-pw-modal" class="modal-close-btn">&times;</button>
       </div>
       <div class="modal-body">
         <div class="input-group">
           <label for="old-password">Password Lama</label>
-          <input type="password" id="old-password" placeholder="Masukkan password saat ini" />
+          <div class="input-icon-wrapper">
+             <span class="input-icon"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg></span>
+             <input type="password" id="old-password" placeholder="Masukkan password saat ini" />
+          </div>
         </div>
         <div class="input-group">
           <label for="new-password">Password Baru</label>
-          <input type="password" id="new-password" placeholder="Minimal 6 karakter" />
+          <div class="input-icon-wrapper">
+             <span class="input-icon"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
+             <input type="password" id="new-password" placeholder="Minimal 6 karakter" />
+          </div>
         </div>
         <div class="input-group">
           <label for="confirm-password">Konfirmasi Password Baru</label>
-          <input type="password" id="confirm-password" placeholder="Ulangi password baru" />
+          <div class="input-icon-wrapper">
+             <span class="input-icon"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></span>
+             <input type="password" id="confirm-password" placeholder="Ulangi password baru" />
+          </div>
         </div>
         <button id="submit-pw-btn" class="primary-btn" style="margin-top: 10px;">Simpan Password</button>
       </div>
