@@ -522,6 +522,21 @@ body {
 }
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
+/* ── WhatsApp Float Btn ── */
+.wa-float-btn {
+  position: fixed; bottom: 24px; right: 24px;
+  width: 56px; height: 56px;
+  background: #25D366; color: white;
+  border-radius: 50%; display: flex;
+  align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+  z-index: 900; transition: all var(--transition-spring);
+}
+.wa-float-btn:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(37, 211, 102, 0.5);
+}
+
 /* ══════════════════════════════════════
    RESPONSIVE
    ══════════════════════════════════════ */

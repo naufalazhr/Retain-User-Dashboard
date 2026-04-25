@@ -195,7 +195,19 @@ function showLogin() {
 function showDashboard(data) {
   UI.loginScreen.classList.remove('active');
   UI.dashboardScreen.classList.add('active');
+  
+  const skeleton = document.getElementById('skeleton-overlay');
+  if (skeleton) skeleton.style.display = 'block';
+  
   renderDashboard(data);
+  
+  // Hide skeleton after brief delay for smooth transition
+  setTimeout(() => {
+    if (skeleton) {
+       skeleton.style.opacity = '0';
+       setTimeout(() => skeleton.style.display = 'none', 300);
+    }
+  }, 400);
 }
 
 // ══════════════════════════════════════
@@ -465,7 +477,7 @@ function updateKeyDisplay() {
 
 function toggleKey() {
   if (!currentSession || !currentSession.data || !currentSession.data.fullKey) {
-     showToast("Full license key tidak tersedia. Silakan update Backend GAS Anda.", "warning");
+     showToast("Data belum lengkap. Silakan Logout dan Login kembali.", "warning");
      return;
   }
   isKeyVisible = !isKeyVisible;
@@ -493,6 +505,18 @@ if (UI.infoCopyKey) UI.infoCopyKey.addEventListener('click', copyKey);
 
 if (currentSession && currentSession.data) {
   showDashboard(currentSession.data);
+  // Background refresh
+  apiLogin(currentSession.email, currentSession.password).then(res => {
+    if (res.success && res.data) {
+      currentSession.data = res.data;
+      if (localStorage.getItem('retain_user_session')) {
+        localStorage.setItem('retain_user_session', JSON.stringify(currentSession));
+      } else {
+        sessionStorage.setItem('retain_user_session', JSON.stringify(currentSession));
+      }
+      renderDashboard(res.data);
+    }
+  });
 } else {
   showLogin();
 }
