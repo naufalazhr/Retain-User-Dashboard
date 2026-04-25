@@ -38,6 +38,11 @@
           </div>
         </div>
         
+        <div class="input-group remember-me-group" style="flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; margin-bottom: 20px; display: flex;">
+          <input type="checkbox" id="remember-me" style="width: auto; margin: 0; cursor: pointer;">
+          <label for="remember-me" style="margin: 0; font-weight: normal; cursor: pointer; color: var(--text-light); font-size: 14px;">Ingat Saya</label>
+        </div>
+        
         <button id="login-btn" class="primary-btn">
           <span class="btn-text">Masuk</span>
           <span class="btn-loader" style="display:none;">
@@ -83,7 +88,10 @@
         </div>
         <div class="hero-stats">
           <div class="hero-stat">
-            <span class="hero-stat-value" id="hero-expire">-</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="hero-stat-value" id="hero-expire">-</span>
+              <span id="hero-countdown" style="display:none; font-size: 12px; padding: 3px 8px; border-radius: 12px; background: rgba(255, 152, 0, 0.2); color: #ff9800; font-weight: 600;">-</span>
+            </div>
             <span class="hero-stat-label">Expired</span>
           </div>
           <div class="hero-divider"></div>

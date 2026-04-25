@@ -56,7 +56,12 @@ const UI = {
 };
 
 // --- Session ---
-let currentSession = JSON.parse(sessionStorage.getItem('retain_user_session') || 'null');
+let currentSession = null;
+try {
+  const localSession = localStorage.getItem('retain_user_session');
+  const sessionSession = sessionStorage.getItem('retain_user_session');
+  currentSession = JSON.parse(localSession || sessionSession || 'null');
+} catch(e) {}
 
 // ══════════════════════════════════════
 // TOAST SYSTEM
@@ -204,11 +209,23 @@ function renderDashboard(data) {
   
   const daysLeft = daysUntilExpiry(data.expire);
   let expireDisplay = formatDate(data.expire);
+  
+  const heroCountdown = document.getElementById('hero-countdown');
+  heroCountdown.style.display = 'none';
+
   if (daysLeft !== null && data.status === 'Active') {
     if (daysLeft <= 0) {
       expireDisplay += ' (Expired!)';
-    } else if (daysLeft <= 7) {
-      expireDisplay = `${daysLeft} hari lagi`;
+    } else {
+      heroCountdown.textContent = `${daysLeft} Hari Lagi`;
+      heroCountdown.style.display = 'inline-block';
+      if (daysLeft <= 7) {
+        heroCountdown.style.background = 'rgba(244, 67, 54, 0.2)';
+        heroCountdown.style.color = '#f44336';
+      } else {
+        heroCountdown.style.background = 'rgba(255, 152, 0, 0.2)';
+        heroCountdown.style.color = '#ff9800';
+      }
     }
   }
   UI.heroExpire.textContent = expireDisplay;
@@ -330,7 +347,15 @@ UI.loginBtn.addEventListener('click', async () => {
   if (res.success && res.data) {
     // Save session
     currentSession = { email, data: res.data };
-    sessionStorage.setItem('retain_user_session', JSON.stringify(currentSession));
+    
+    const rememberMe = document.getElementById('remember-me').checked;
+    if (rememberMe) {
+      localStorage.setItem('retain_user_session', JSON.stringify(currentSession));
+      sessionStorage.removeItem('retain_user_session');
+    } else {
+      sessionStorage.setItem('retain_user_session', JSON.stringify(currentSession));
+      localStorage.removeItem('retain_user_session');
+    }
     
     showToast('Login berhasil!', 'success');
     showDashboard(res.data);
@@ -351,6 +376,7 @@ UI.userEmail.addEventListener('keypress', (e) => {
 // Logout
 UI.logoutBtn.addEventListener('click', () => {
   sessionStorage.removeItem('retain_user_session');
+  localStorage.removeItem('retain_user_session');
   currentSession = null;
   showLogin();
   showToast('Logout berhasil', 'success');
