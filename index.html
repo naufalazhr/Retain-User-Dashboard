@@ -84,7 +84,11 @@
             <span id="hero-status-badge" class="hero-badge Active">Active</span>
           </div>
           <h2 id="hero-package">Starter</h2>
-          <p class="hero-sub" id="hero-key">RET-****-XXXX</p>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <p class="hero-sub" id="hero-key" style="margin: 0;">RET-****-XXXX</p>
+            <button id="hero-toggle-key" class="icon-btn" title="Tampilkan/Sembunyikan" style="padding: 2px 6px; font-size: 14px; border:none; background:transparent;">👁️</button>
+            <button id="hero-copy-key" class="icon-btn" title="Copy License Key" style="padding: 2px 6px; font-size: 14px; border:none; background:transparent; display:none;">📋</button>
+          </div>
         </div>
         <div class="hero-stats">
           <div class="hero-stat">
@@ -108,7 +112,11 @@
           <div class="info-card-icon blue">📋</div>
           <div class="info-card-body">
             <span class="info-card-label">License Key</span>
-            <span class="info-card-value" id="info-key">-</span>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span class="info-card-value" id="info-key">-</span>
+              <button id="info-toggle-key" class="icon-btn" title="Tampilkan/Sembunyikan" style="padding: 2px; font-size: 14px; border:none; background:transparent;">👁️</button>
+              <button id="info-copy-key" class="icon-btn" title="Copy License Key" style="padding: 2px; font-size: 14px; border:none; background:transparent; display:none;">📋</button>
+            </div>
           </div>
         </div>
         <div class="info-card glass-panel">

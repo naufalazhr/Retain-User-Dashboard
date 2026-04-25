@@ -35,11 +35,15 @@ const UI = {
   heroStatusBadge: document.getElementById('hero-status-badge'),
   heroPackage: document.getElementById('hero-package'),
   heroKey: document.getElementById('hero-key'),
+  heroToggleKey: document.getElementById('hero-toggle-key'),
+  heroCopyKey: document.getElementById('hero-copy-key'),
   heroExpire: document.getElementById('hero-expire'),
   heroShops: document.getElementById('hero-shops'),
   
   // Info cards
   infoKey: document.getElementById('info-key'),
+  infoToggleKey: document.getElementById('info-toggle-key'),
+  infoCopyKey: document.getElementById('info-copy-key'),
   infoPkg: document.getElementById('info-pkg'),
   infoStatus: document.getElementById('info-status'),
   infoExpire: document.getElementById('info-expire'),
@@ -57,6 +61,7 @@ const UI = {
 
 // --- Session ---
 let currentSession = null;
+let isKeyVisible = false;
 try {
   const localSession = localStorage.getItem('retain_user_session');
   const sessionSession = sessionStorage.getItem('retain_user_session');
@@ -198,15 +203,23 @@ function showDashboard(data) {
 // ══════════════════════════════════════
 
 function renderDashboard(data) {
-  // Header
-  UI.userEmailDisplay.textContent = data.email || '';
+  // Update Header
+  UI.userEmailDisplay.textContent = data.email;
   
-  // Hero
+  // Update Hero
+  UI.heroPackage.textContent = data.pkg;
+  
+  // Default to masked key on render
+  isKeyVisible = false;
+  if(typeof updateKeyDisplay === 'function') updateKeyDisplay();
+  else {
+    UI.heroKey.textContent = data.key;
+    UI.infoKey.textContent = data.key;
+  }
+  
   UI.heroStatusBadge.textContent = data.status;
-  UI.heroStatusBadge.className = `hero-badge ${data.status}`;
+  UI.heroStatusBadge.className = 'hero-badge ' + data.status;
   UI.heroPackage.textContent = PKG_LABELS[data.pkg] || data.pkg;
-  UI.heroKey.textContent = data.key;
-  
   const daysLeft = daysUntilExpiry(data.expire);
   let expireDisplay = formatDate(data.expire);
   
@@ -231,11 +244,11 @@ function renderDashboard(data) {
   UI.heroExpire.textContent = expireDisplay;
   UI.heroShops.textContent = `${data.shops.length} / ${data.maxShops}`;
   
-  // Info Cards
-  UI.infoKey.textContent = data.key;
-  UI.infoPkg.textContent = PKG_LABELS[data.pkg] || data.pkg;
+  // Update Info Grid
+  UI.infoPkg.textContent = data.pkg;
   UI.infoStatus.textContent = data.status;
-  UI.infoExpire.textContent = formatDate(data.expire);
+  UI.infoStatus.className = 'info-card-value ' + data.status;
+  UI.infoExpire.textContent = expireDisplay;
   
   // Shops
   renderShops(data.shops, data.maxShops);
@@ -431,6 +444,48 @@ UI.submitPwBtn.addEventListener('click', async () => {
     showToast(res.message || 'Gagal mengubah password.', 'error');
   }
 });
+
+// ══════════════════════════════════════
+// KEY TOGGLE & COPY LOGIC
+// ══════════════════════════════════════
+function updateKeyDisplay() {
+  if (!currentSession || !currentSession.data) return;
+  const keyToDisplay = isKeyVisible && currentSession.data.fullKey ? currentSession.data.fullKey : currentSession.data.key;
+  
+  if(UI.heroKey) UI.heroKey.textContent = keyToDisplay;
+  if(UI.infoKey) UI.infoKey.textContent = keyToDisplay;
+  
+  const toggleIcon = isKeyVisible ? '🙈' : '👁️';
+  if(UI.heroToggleKey) UI.heroToggleKey.textContent = toggleIcon;
+  if(UI.infoToggleKey) UI.infoToggleKey.textContent = toggleIcon;
+  
+  if(UI.heroCopyKey) UI.heroCopyKey.style.display = isKeyVisible ? 'inline-block' : 'none';
+  if(UI.infoCopyKey) UI.infoCopyKey.style.display = isKeyVisible ? 'inline-block' : 'none';
+}
+
+function toggleKey() {
+  if (!currentSession || !currentSession.data || !currentSession.data.fullKey) {
+     showToast("Full license key tidak tersedia. Silakan update Backend GAS Anda.", "warning");
+     return;
+  }
+  isKeyVisible = !isKeyVisible;
+  updateKeyDisplay();
+}
+
+function copyKey() {
+  if (currentSession && currentSession.data && currentSession.data.fullKey) {
+    navigator.clipboard.writeText(currentSession.data.fullKey).then(() => {
+      showToast('License key disalin!', 'success');
+    }).catch(err => {
+      showToast('Gagal menyalin text', 'error');
+    });
+  }
+}
+
+if (UI.heroToggleKey) UI.heroToggleKey.addEventListener('click', toggleKey);
+if (UI.infoToggleKey) UI.infoToggleKey.addEventListener('click', toggleKey);
+if (UI.heroCopyKey) UI.heroCopyKey.addEventListener('click', copyKey);
+if (UI.infoCopyKey) UI.infoCopyKey.addEventListener('click', copyKey);
 
 // ══════════════════════════════════════
 // INIT — Restore session
