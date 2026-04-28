@@ -633,5 +633,16 @@ if (currentSession && currentSession.data) {
     }
   });
 } else {
-  showLogin();
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('action') === 'setup') {
+    const emailParam = urlParams.get('email');
+    if (emailParam && UI.setupEmail) {
+      UI.setupEmail.value = decodeURIComponent(emailParam);
+    }
+    showSetup();
+    // Clean up URL for better UX
+    window.history.replaceState({}, document.title, window.location.pathname);
+  } else {
+    showLogin();
+  }
 }
