@@ -618,7 +618,23 @@ if (UI.infoCopyKey) UI.infoCopyKey.addEventListener('click', copyKey);
 // INIT — Restore session
 // ══════════════════════════════════════
 
-if (currentSession && currentSession.data) {
+const urlParams = new URLSearchParams(window.location.search);
+const isSetupAction = urlParams.get('action') === 'setup';
+
+if (isSetupAction) {
+  // Clear existing session to ensure clean setup flow
+  sessionStorage.removeItem('retain_user_session');
+  localStorage.removeItem('retain_user_session');
+  currentSession = null;
+  
+  const emailParam = urlParams.get('email');
+  if (emailParam && UI.setupEmail) {
+    UI.setupEmail.value = decodeURIComponent(emailParam);
+  }
+  showSetup();
+  // Clean up URL for better UX
+  window.history.replaceState({}, document.title, window.location.pathname);
+} else if (currentSession && currentSession.data) {
   showDashboard(currentSession.data);
   // Background refresh
   apiLogin(currentSession.email, currentSession.password).then(res => {
@@ -633,16 +649,5 @@ if (currentSession && currentSession.data) {
     }
   });
 } else {
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('action') === 'setup') {
-    const emailParam = urlParams.get('email');
-    if (emailParam && UI.setupEmail) {
-      UI.setupEmail.value = decodeURIComponent(emailParam);
-    }
-    showSetup();
-    // Clean up URL for better UX
-    window.history.replaceState({}, document.title, window.location.pathname);
-  } else {
-    showLogin();
-  }
+  showLogin();
 }
