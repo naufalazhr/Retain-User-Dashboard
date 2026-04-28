@@ -51,7 +51,56 @@
         </button>
         <p id="login-error" class="error-msg"></p>
       </div>
-      <p class="login-footer">Belum punya lisensi? <a href="https://roaslab.retain.co.id" target="_blank">Dapatkan di sini</a></p>
+      <p class="login-footer">Belum punya password? <a href="#" id="go-to-setup">Buat di sini</a></p>
+      <p class="login-footer" style="margin-top: 5px;">Belum punya lisensi? <a href="https://roaslab.retain.co.id" target="_blank">Dapatkan di sini</a></p>
+    </div>
+  </div>
+
+  <!-- Setup Password Screen -->
+  <div id="setup-screen" class="screen full-center">
+    <div class="login-container">
+      <div class="login-brand">
+        <div class="brand-icon">🚀</div>
+        <h1>Retain <span>ROASlab</span></h1>
+        <p class="brand-tagline">Buat Password Akun Anda</p>
+      </div>
+      <div class="glass-panel login-panel">
+        <h2>Buat Password Baru</h2>
+        <p>Silakan buat password untuk akun dengan email yang Anda gunakan saat pembelian.</p>
+        
+        <div class="input-group">
+          <label for="setup-email">Email Terdaftar</label>
+          <div class="input-icon-wrapper">
+            <span class="input-icon"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></span>
+            <input type="email" id="setup-email" placeholder="Email saat pembelian" autocomplete="email"/>
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label for="setup-password">Password Baru</label>
+          <div class="input-icon-wrapper">
+            <span class="input-icon"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
+            <input type="password" id="setup-password" placeholder="Minimal 6 karakter" autocomplete="new-password"/>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="setup-confirm-password">Konfirmasi Password</label>
+          <div class="input-icon-wrapper">
+            <span class="input-icon"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></span>
+            <input type="password" id="setup-confirm-password" placeholder="Ulangi password baru" autocomplete="new-password"/>
+          </div>
+        </div>
+        
+        <button id="setup-btn" class="primary-btn">
+          <span class="btn-text">Buat Password</span>
+          <span class="btn-loader" style="display:none;">
+            <span class="spinner"></span> Memproses...
+          </span>
+        </button>
+        <p id="setup-error" class="error-msg"></p>
+      </div>
+      <p class="login-footer">Sudah punya password? <a href="#" id="back-to-login">Kembali ke Login</a></p>
     </div>
   </div>
 

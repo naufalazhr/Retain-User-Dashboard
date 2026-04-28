@@ -3,11 +3,12 @@
 // ═══════════════════════════════════════════════════════
 
 // --- KONFIGURASI ---
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwJn_plhpxDUyBt02YluccB57PJx8aQV0yI8Em7iz2qJ8zMErd2V3P_ZWyK5dcIcEQtcw/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxrueGBisIMZ0JyQJoQ-1POU67JscSFYPmaxbKaLBTwGGlPGtG_a_wrBUscyukYBfXngw/exec';
 
 // --- UI Elements ---
 const UI = {
   loginScreen: document.getElementById('login-screen'),
+  setupScreen: document.getElementById('setup-screen'),
   dashboardScreen: document.getElementById('dashboard-screen'),
   
   // Login
@@ -17,6 +18,15 @@ const UI = {
   loginError: document.getElementById('login-error'),
   btnText: null, // set after DOM ready
   btnLoader: null,
+  
+  // Setup
+  setupEmail: document.getElementById('setup-email'),
+  setupPassword: document.getElementById('setup-password'),
+  setupConfirmPassword: document.getElementById('setup-confirm-password'),
+  setupBtn: document.getElementById('setup-btn'),
+  setupError: document.getElementById('setup-error'),
+  goToSetupBtn: document.getElementById('go-to-setup'),
+  backToLoginBtn: document.getElementById('back-to-login'),
   
   // Header
   userEmailDisplay: document.getElementById('user-email-display'),
@@ -183,17 +193,52 @@ async function apiChangePassword(email, oldPassword, newPassword) {
   }
 }
 
+async function apiSetInitialPassword(email, newPassword) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+  
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'user_set_initial_password',
+        email: email,
+        newPassword: newPassword
+      }),
+      redirect: 'follow',
+      signal: controller.signal
+    });
+    return await res.json();
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      return { success: false, message: 'Koneksi timeout. Server tidak merespons.' };
+    }
+    return { success: false, message: 'Gagal terhubung ke server.' };
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 // ══════════════════════════════════════
 // ROUTING
 // ══════════════════════════════════════
 
 function showLogin() {
   UI.loginScreen.classList.add('active');
+  UI.setupScreen.classList.remove('active');
+  UI.dashboardScreen.classList.remove('active');
+}
+
+function showSetup() {
+  UI.loginScreen.classList.remove('active');
+  UI.setupScreen.classList.add('active');
   UI.dashboardScreen.classList.remove('active');
 }
 
 function showDashboard(data) {
   UI.loginScreen.classList.remove('active');
+  UI.setupScreen.classList.remove('active');
   UI.dashboardScreen.classList.add('active');
   
   const skeleton = document.getElementById('skeleton-overlay');
@@ -397,6 +442,73 @@ UI.userPassword.addEventListener('keypress', (e) => {
 UI.userEmail.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') UI.userPassword.focus();
 });
+
+// Navigate to Setup
+if (UI.goToSetupBtn) {
+  UI.goToSetupBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    showSetup();
+  });
+}
+
+if (UI.backToLoginBtn) {
+  UI.backToLoginBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    showLogin();
+  });
+}
+
+// Setup Password Handler
+if (UI.setupBtn) {
+  UI.setupBtn.addEventListener('click', async () => {
+    const email = UI.setupEmail.value.trim();
+    const password = UI.setupPassword.value.trim();
+    const confirmPassword = UI.setupConfirmPassword.value.trim();
+    
+    if (!email || !password || !confirmPassword) {
+      UI.setupError.style.display = 'block';
+      UI.setupError.textContent = 'Semua field harus diisi!';
+      return;
+    }
+    
+    if (password !== confirmPassword) {
+      UI.setupError.style.display = 'block';
+      UI.setupError.textContent = 'Konfirmasi password tidak cocok!';
+      return;
+    }
+    
+    if (password.length < 6) {
+      UI.setupError.style.display = 'block';
+      UI.setupError.textContent = 'Password minimal 6 karakter!';
+      return;
+    }
+    
+    // Loading state
+    const btnText = UI.setupBtn.querySelector('.btn-text');
+    const btnLoader = UI.setupBtn.querySelector('.btn-loader');
+    btnText.style.display = 'none';
+    btnLoader.style.display = 'inline-flex';
+    UI.setupBtn.disabled = true;
+    UI.setupError.style.display = 'none';
+    
+    const res = await apiSetInitialPassword(email, password);
+    
+    // Reset button
+    btnText.style.display = 'inline';
+    btnLoader.style.display = 'none';
+    UI.setupBtn.disabled = false;
+    
+    if (res.success) {
+      showToast('Password berhasil dibuat! Silakan login.', 'success');
+      UI.userEmail.value = email; // pre-fill login
+      UI.userPassword.value = '';
+      showLogin();
+    } else {
+      UI.setupError.style.display = 'block';
+      UI.setupError.textContent = res.message || 'Gagal membuat password.';
+    }
+  });
+}
 
 // Logout
 UI.logoutBtn.addEventListener('click', () => {
