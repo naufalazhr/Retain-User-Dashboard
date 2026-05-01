@@ -120,7 +120,7 @@ body {
   animation: iconPulse 3s ease-in-out infinite;
 }
 .brand-logo {
-  width: 56px; height: 56px; margin: 0 auto 16px;
+  width: 168px; height: 168px; margin: 0 auto 16px;
   display: block; object-fit: contain;
   filter: drop-shadow(0 4px 12px var(--primary-glow));
 }
